@@ -43,6 +43,27 @@ public abstract class InteractableObject : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
         }
         audioSource.playOnAwake = false;
+
+        SetVisualActive(false);
+        canInteract = false;
+
+        StartCoroutine(InitialSpawnRoutine());
+    }
+
+    private System.Collections.IEnumerator InitialSpawnRoutine()
+    {
+        float delay = Random.Range(15, 45);
+
+        yield return new WaitForSeconds(delay);
+
+        SetVisualActive(true);
+
+        if (sound != null)
+            audioSource.PlayOneShot(sound);
+
+        canInteract = true;
+
+        angerTimer = 0f;
     }
 
     void Update()
