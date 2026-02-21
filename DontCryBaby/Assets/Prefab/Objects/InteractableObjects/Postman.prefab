@@ -204,6 +204,8 @@ MonoBehaviour:
   eventCooldown: 60
   triggerBabyCooldown: 10
   canInteract: 1
+  triggerMultiplier: 0.2
+  alwaysDisplayed: 0
   progressBarParent: {fileID: 1662338967581297276}
   segmentPrefab: {fileID: 1915684018302189458, guid: 6bc78496391f52d48a063ad68e5c0391, type: 3}
   progressBarWidth: 1

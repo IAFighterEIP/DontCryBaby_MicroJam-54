@@ -4,31 +4,59 @@ using UnityEngine;
 public abstract class InteractableObject : MonoBehaviour
 {
     [Header("Base Settings")]
-    public string objectName;
-    public string interactionText;
-    public int clicksRequired = 1;
-    public float actionCooldown = 0.5f;
-    public float eventCooldown = 10f;
-    public float triggerBabyCooldown = 10f;
-    public bool canInteract = true;
+    [SerializeField]
+    private string objectName;
+
+    [SerializeField]
+    private string interactionText;
+
+    [SerializeField]
+    private int clicksRequired = 1;
+
+    [SerializeField]
+    private float actionCooldown = 0.5f;
+
+    [SerializeField]
+    private float eventCooldown = 10f;
+
+    [SerializeField]
+    private float triggerBabyCooldown = 10f;
+    public bool canInteract = false;
     protected int currentClicks = 0;
     private float angerTimer = 0f;
+    private BabyController baby;
+
+    [SerializeField]
+    private float triggerMultiplier = 0.1f;
+
+    [SerializeField]
+    bool alwaysDisplayed = true;
 
     [Header("ProgressBar")]
-    public Transform progressBarParent; // drag & drop le GameObject ProgressBar
-    public SpriteRenderer segmentPrefab; // drag & drop ton sprite carré
+    [SerializeField]
+    private Transform progressBarParent; // drag & drop le GameObject ProgressBar
+
+    [SerializeField]
+    private SpriteRenderer segmentPrefab; // drag & drop ton sprite carré
     private SpriteRenderer[] segments;
 
     [Header("ProgressBar Settings")]
-    public float progressBarWidth = 1f; // largeur totale de la barre
-    public float spacing = 0f; // petit écart entre les segments
+    [SerializeField]
+    private float progressBarWidth = 1f; // largeur totale de la barre
+
+    [SerializeField]
+    private float spacing = 0f; // petit écart entre les segments
 
     [Header("Dialog")]
-    public TextMeshProUGUI dialogText;
-    public string defaultMessage = "";
+    [SerializeField]
+    private TextMeshProUGUI dialogText;
+
+    [SerializeField]
+    private string defaultMessage = "";
 
     [Header("Audio")]
-    public AudioClip sound;
+    [SerializeField]
+    private AudioClip sound;
     private AudioSource audioSource;
 
     void Start()
@@ -46,6 +74,8 @@ public abstract class InteractableObject : MonoBehaviour
 
         SetVisualActive(false);
         canInteract = false;
+
+        baby = FindObjectOfType<BabyController>();
 
         StartCoroutine(InitialSpawnRoutine());
     }
@@ -80,6 +110,12 @@ public abstract class InteractableObject : MonoBehaviour
                 audioSource.PlayOneShot(sound);
             angerTimer = 0f;
         }
+    }
+
+    void TriggerBaby()
+    {
+        if (baby != null)
+            baby.IncreaseAngerMultiplier(triggerMultiplier);
     }
 
     private bool IsVisible()
@@ -193,7 +229,16 @@ public abstract class InteractableObject : MonoBehaviour
         // sprite principal
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         if (sr != null)
-            sr.enabled = state;
+        {
+            if (alwaysDisplayed)
+            {
+                sr.enabled = true;
+            }
+            else
+            {
+                sr.enabled = state;
+            }
+        }
 
         // progress bar
         if (progressBarParent != null)
