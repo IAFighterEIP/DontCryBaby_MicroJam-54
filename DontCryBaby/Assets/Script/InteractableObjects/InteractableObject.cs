@@ -21,5 +21,7 @@ public abstract class InteractableObject : MonoBehaviour
         }
     }
 
-    protected abstract void CompleteInteraction();
+    protected void CompleteInteraction(){
+        Debug.Log(interactionText);
+    }
 }
