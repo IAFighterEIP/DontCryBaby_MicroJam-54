@@ -764,6 +764,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3276451923783923110, guid: c3afda54dee3c8f43bcb971671b5f5c5, type: 3}
+      propertyPath: m_SortingLayer
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3276451923783923110, guid: c3afda54dee3c8f43bcb971671b5f5c5, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 603699453
+      objectReference: {fileID: 0}
     - target: {fileID: 4132367081887762308, guid: c3afda54dee3c8f43bcb971671b5f5c5, type: 3}
       propertyPath: m_Name
       value: BabySitter
