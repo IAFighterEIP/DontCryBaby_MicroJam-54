@@ -22,7 +22,6 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            Debug.Log("key E");
             TryInteract();
         }
     }
@@ -39,18 +38,13 @@ public class PlayerController : MonoBehaviour
         InteractableObject closest = null;
         float minDistance = Mathf.Infinity;
 
-        Debug.Log("try interact");
         foreach (Collider2D hit in hits)
         {
             if (hit.gameObject == gameObject)
                 continue; // éviter de collide avec le babysitter
-            Debug.Log("for each");
-            Debug.Log(hit);
-            InteractableObject interactable = hit.GetComponent<InteractableObject>();
 
-            Debug.Log(interactable);
-            Debug.Log(interactable.canInteract);
-            if (interactable != null && interactable.canInteract)
+            var component = hit.GetComponent<MonoBehaviour>();
+            if (component is InteractableObject interactable && interactable.canInteract)
             {
                 float distance = Vector2.Distance(transform.position, hit.transform.position);
 
@@ -62,10 +56,8 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        Debug.Log("finish for each");
         if (closest != null)
         {
-            Debug.Log("call interact");
             closest.Interact();
         }
     }
