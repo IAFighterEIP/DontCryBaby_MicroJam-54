@@ -104,7 +104,7 @@ GameObject:
   - component: {fileID: -6804657211853263531}
   - component: {fileID: 1596185568139423497}
   m_Layer: 0
-  m_Name: Postman
+  m_Name: Laundry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -197,9 +197,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51e5a128c6bcf2a4ea8ef764d8b64cc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  objectName: Postman
-  interactionText: Package received!
-  clicksRequired: 1
+  objectName: Laundry
+  interactionText: The laundry is done !
+  clicksRequired: 5
   actionCooldown: 0.5
   eventCooldown: 60
   triggerBabyCooldown: 10
@@ -209,8 +209,8 @@ MonoBehaviour:
   progressBarWidth: 1
   spacing: 0
   dialogText: {fileID: 7015012238134478871}
-  defaultMessage: There is a package for you !
-  sound: {fileID: 8300000, guid: 08928ce91fe9b6f4d9988244a05a8a9f, type: 3}
+  defaultMessage: The laundry must be hung out
+  sound: {fileID: 8300000, guid: 5d923de70a470084baf0189a9ad40a60, type: 3}
 --- !u!61 &1596185568139423497
 BoxCollider2D:
   m_ObjectHideFlags: 0

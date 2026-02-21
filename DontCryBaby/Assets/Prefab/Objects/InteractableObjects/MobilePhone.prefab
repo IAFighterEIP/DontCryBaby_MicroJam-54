@@ -104,7 +104,7 @@ GameObject:
   - component: {fileID: -6804657211853263531}
   - component: {fileID: 1596185568139423497}
   m_Layer: 0
-  m_Name: Postman
+  m_Name: MobilePhone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -197,20 +197,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51e5a128c6bcf2a4ea8ef764d8b64cc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  objectName: Postman
-  interactionText: Package received!
+  objectName: Mobile Phone
+  interactionText: Call ended
   clicksRequired: 1
   actionCooldown: 0.5
-  eventCooldown: 60
-  triggerBabyCooldown: 10
+  eventCooldown: 45
+  triggerBabyCooldown: 5
   canInteract: 1
   progressBarParent: {fileID: 1662338967581297276}
   segmentPrefab: {fileID: 1915684018302189458, guid: 6bc78496391f52d48a063ad68e5c0391, type: 3}
   progressBarWidth: 1
   spacing: 0
   dialogText: {fileID: 7015012238134478871}
-  defaultMessage: There is a package for you !
-  sound: {fileID: 8300000, guid: 08928ce91fe9b6f4d9988244a05a8a9f, type: 3}
+  defaultMessage: The phone is ringing !
+  sound: {fileID: 8300000, guid: e288f53bb5f67984ab3f36a1c5ee850a, type: 3}
 --- !u!61 &1596185568139423497
 BoxCollider2D:
   m_ObjectHideFlags: 0
