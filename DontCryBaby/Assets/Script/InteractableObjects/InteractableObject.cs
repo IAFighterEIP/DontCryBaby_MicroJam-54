@@ -9,10 +9,10 @@ public abstract class InteractableObject : MonoBehaviour
     public int clicksRequired = 1;
     public float actionCooldown = 0.5f;
     public float eventCooldown = 10f;
-
+    public float triggerBabyCooldown = 10f;
     public bool canInteract = true;
-
     protected int currentClicks = 0;
+    private float angerTimer = 0f;
 
     [Header("ProgressBar")]
     public Transform progressBarParent; // drag & drop le GameObject ProgressBar
@@ -24,14 +24,50 @@ public abstract class InteractableObject : MonoBehaviour
     public float spacing = 0f; // petit écart entre les segments
 
     [Header("Dialog")]
-    public TextMeshProUGUI dialogText; // ou Text si tu utilises l’UI classique
+    public TextMeshProUGUI dialogText;
     public string defaultMessage = "";
+
+    [Header("Audio")]
+    public AudioClip sound;
+    private AudioSource audioSource;
 
     void Start()
     {
         CreateProgressBar();
         if (dialogText != null)
             dialogText.text = defaultMessage;
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        audioSource.playOnAwake = false;
+    }
+
+    void Update()
+    {
+        if (!canInteract || !IsVisible())
+            return;
+
+        angerTimer += Time.deltaTime;
+
+        if (angerTimer >= triggerBabyCooldown)
+        {
+            Debug.Log("Baby gets angrier!");
+            if (sound != null)
+                audioSource.PlayOneShot(sound);
+            angerTimer = 0f;
+        }
+    }
+
+    private bool IsVisible()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if (sr != null)
+            return sr.enabled;
+
+        return false;
     }
 
     void CreateProgressBar()
@@ -73,14 +109,12 @@ public abstract class InteractableObject : MonoBehaviour
             return;
 
         currentClicks++;
+        angerTimer = 0f;
         UpdateProgressUI();
 
         if (currentClicks >= clicksRequired)
         {
-            CompleteInteraction();
-            currentClicks = 0;
-            StartCoroutine(EventCooldownRoutine());
-            UpdateProgressUI();
+            StartCoroutine(CompleteAndCooldownRoutine());
         }
         else
         {
@@ -88,10 +122,34 @@ public abstract class InteractableObject : MonoBehaviour
         }
     }
 
-    private System.Collections.IEnumerator EventCooldownRoutine()
+    private System.Collections.IEnumerator CompleteAndCooldownRoutine()
     {
         canInteract = false;
+
+        CompleteInteraction();
+
+        // attendre 2 secondes pour lire le message
+        yield return new WaitForSeconds(2f);
+
+        // cacher visuellement l'objet
+        SetVisualActive(false);
+
+        // attendre le event cooldown
         yield return new WaitForSeconds(eventCooldown);
+
+        // réafficher
+        SetVisualActive(true);
+
+        if (sound != null)
+            audioSource.PlayOneShot(sound);
+
+        // reset
+        currentClicks = 0;
+        UpdateProgressUI();
+
+        if (dialogText != null)
+            dialogText.text = defaultMessage;
+
         canInteract = true;
     }
 
@@ -107,5 +165,21 @@ public abstract class InteractableObject : MonoBehaviour
         Debug.Log(interactionText);
         if (dialogText != null)
             dialogText.text = interactionText;
+    }
+
+    private void SetVisualActive(bool state)
+    {
+        // sprite principal
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if (sr != null)
+            sr.enabled = state;
+
+        // progress bar
+        if (progressBarParent != null)
+            progressBarParent.gameObject.SetActive(state);
+
+        // dialog
+        if (dialogText != null)
+            dialogText.gameObject.SetActive(state);
     }
 }

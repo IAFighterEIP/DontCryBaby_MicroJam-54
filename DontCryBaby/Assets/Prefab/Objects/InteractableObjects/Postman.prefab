@@ -202,6 +202,7 @@ MonoBehaviour:
   clicksRequired: 1
   actionCooldown: 0.5
   eventCooldown: 5
+  triggerBabyCooldown: 10
   canInteract: 1
   progressBarParent: {fileID: 1662338967581297276}
   segmentPrefab: {fileID: 1915684018302189458, guid: 6bc78496391f52d48a063ad68e5c0391, type: 3}
@@ -209,6 +210,7 @@ MonoBehaviour:
   spacing: 0
   dialogText: {fileID: 7015012238134478871}
   defaultMessage: There is a package for you !
+  sound: {fileID: 8300000, guid: 08928ce91fe9b6f4d9988244a05a8a9f, type: 3}
 --- !u!61 &1596185568139423497
 BoxCollider2D:
   m_ObjectHideFlags: 0
