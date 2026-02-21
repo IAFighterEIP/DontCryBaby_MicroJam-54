@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1118829658975759150}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -118,7 +118,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!61 &748936482302511646
 BoxCollider2D:
@@ -181,19 +181,41 @@ MonoBehaviour:
   anger: 0
   maxAnger: 100
   baseAngerRate: 3
-  multiplier: 1
+  angerMultiplier: 1
+  minMultiplier: 1
   maxMultiplier: 6
   baseSpeed: 2
   maxSpeed: 6
-  minX: -8
-  maxX: 8
-  minY: -4
-  maxY: 4
-  visual: {fileID: 0}
-  minScale: 0.9
-  maxScale: 1.8
-  calmColor: {r: 1, g: 1, b: 1, a: 1}
+  wanderChangeMin: 0.6
+  wanderChangeMax: 1.4
+  calmThreshold: 20
+  rageThreshold: 50
+  calmSearchRadius: 2.5
+  rageSearchRadius: 10
+  retargetCooldown: 0.25
+  stopDistance: 0.25
+  giveUpDistanceMultiplier: 1.5
+  breakableMask:
+    serializedVersion: 2
+    m_Bits: 128
+  minDamage: 5
+  maxDamageAtFullAnger: 20
+  hitCooldown: 0.12
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 64
+  avoidDistance: 0.6
+  avoidStrength: 2
+  sideRayAngle: 35
+  sideRayScale: 0.9
+  stuckSpeedThreshold: 0.15
+  stuckTimeToRecover: 0.6
+  sprite: {fileID: 330934860037820071}
+  enableAngerTint: 1
   angryColor: {r: 1, g: 0, b: 0, a: 1}
-  shakeIntensity: 0.05
+  enableAngerScale: 1
+  maxScaleBonus: 2
+  enableShaking: 1
+  shakeThreshold: 60
   shakeSpeed: 25
-  wanderChangeInterval: 1
+  maxShakeScaleJitter: 0.04
