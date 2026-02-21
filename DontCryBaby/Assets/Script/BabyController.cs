@@ -1,226 +1,316 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class BabyController : MonoBehaviour
 {
-    [Header("Anger")]
+    [Header("Anger (time-based)")]
     [SerializeField] private float anger = 0f;
     [SerializeField] private float maxAnger = 100f;
-    [SerializeField] private float baseAngerRate = 3f;   // anger/sec at multiplier=1
-    [SerializeField] private float multiplier = 1f;
-    [SerializeField] private float maxMultiplier = 3f;
+    [SerializeField] private float baseAngerRate = 8f;
+
+    [Header("Anger Multiplier (modified by triggers)")]
+    [SerializeField] private float angerMultiplier = 1f;
+    [SerializeField] private float minMultiplier = 1f;
+    [SerializeField] private float maxMultiplier = 6f;
 
     [Header("Movement")]
-    [SerializeField] private float baseSpeed = 2f;
-    [SerializeField] private float maxSpeed = 10f;
-
-    [Header("Bounds")]
-    [SerializeField] private float minX = -8f;
-    [SerializeField] private float maxX = 8f;
-    [SerializeField] private float minY = -4f;
-    [SerializeField] private float maxY = 4f;
-
-    [Header("Visuals")]
-    [Tooltip("Optional. If empty, the script auto-creates a child named 'Visual' and moves the sprite there.")]
-    [SerializeField] private Transform visual;
-    [SerializeField] private float minScale = 0.9f;
-    [SerializeField] private float maxScale = 1.8f;
-    [SerializeField] private Color calmColor = Color.white;
-    [SerializeField] private Color angryColor = Color.red;
-
-    [Header("Shake (Visual only)")]
-    [SerializeField] private float shakeIntensity = 0.05f;
-    [SerializeField] private float shakeSpeed = 25f;
+    [SerializeField] private float baseSpeed = 1.5f;
+    [SerializeField] private float maxSpeed = 4.5f;
 
     [Header("Wander")]
-    [SerializeField] private float wanderChangeInterval = 1.0f;
+    [SerializeField] private float wanderChangeMin = 0.6f;
+    [SerializeField] private float wanderChangeMax = 1.4f;
+    private Vector2 wanderDir = Vector2.right;
+    private float wanderTimer = 0f;
+
+    [Header("Breakables Hunt")]
+    [SerializeField] private float calmThreshold = 20f;         // below: wander unless breakable close
+    [SerializeField] private float rageThreshold = 50f;         // above: hunt aggressively
+    [SerializeField] private float calmSearchRadius = 2.5f;
+    [SerializeField] private float rageSearchRadius = 10f;
+    [SerializeField] private float retargetCooldown = 0.25f;
+    [SerializeField] private float stopDistance = 0.25f;        // how close to “stick” to target
+    [SerializeField] private float giveUpDistanceMultiplier = 1.5f; // if target too far away, drop it
+    [SerializeField] private LayerMask breakableMask;
+
+    [Header("Damage (anger -> damage)")]
+    [SerializeField] private float minDamage = 5f;
+    [SerializeField] private float maxDamageAtFullAnger = 20f;
+    [SerializeField] private float hitCooldown = 0.12f;
+
+    [Header("Obstacle Avoidance (walls/furniture ONLY)")]
+    [SerializeField] private LayerMask obstacleMask;  // DO NOT include breakables here
+    [SerializeField] private float avoidDistance = 0.6f;
+    [SerializeField] private float avoidStrength = 2.0f;
+    [SerializeField] private float sideRayAngle = 35f;
+    [SerializeField] private float sideRayScale = 0.9f;
+
+    [Header("Anti-Stuck")]
+    [SerializeField] private float stuckSpeedThreshold = 0.15f;
+    [SerializeField] private float stuckTimeToRecover = 0.6f;
+
+    [Header("Visuals (ROOT)")]
+    [SerializeField] private SpriteRenderer sprite; // auto if null
+    [SerializeField] private bool enableAngerTint = true;
+    [SerializeField] private Color angryColor = Color.red;
+
+    [SerializeField] private bool enableAngerScale = true;
+    [SerializeField] private float maxScaleBonus = 0.25f;
+
+    [Header("Shake (ROOT, no movement disturbance)")]
+    [SerializeField] private bool enableShaking = true;
+    [SerializeField] private float shakeThreshold = 60f;
+    [SerializeField] private float shakeSpeed = 25f;
+    [SerializeField] private float maxShakeScaleJitter = 0.04f;
+
+    [Header("Clean scaling (always shrink when anger drops)")]
+    [SerializeField] private bool captureCalmScaleOnStart = true;
+    [SerializeField] private Vector3 calmScale = Vector3.one;
+    [SerializeField] private float scaleSmooth = 18f; // set 0 for instant
 
     private Rigidbody2D rb;
-    private SpriteRenderer sr;
 
-    private Vector2 wanderDir;
-    private float wanderTimer;
+    private Transform breakTarget;
+    private float retargetTimer = 0f;
+    private float stuckTimer = 0f;
 
-    private bool isShaking = false;
-    private Vector3 visualOriginalLocalPos;
+    private float lastDamageTime = -999f;
+
+    private Color baseColor = Color.white;
+
+    // smoothed scale output
+    private Vector3 currentScale;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        if (rb == null)
-        {
-            Debug.LogError("[BabyController] Missing Rigidbody2D on Baby.");
-            enabled = false;
-            return;
-        }
+        rb.freezeRotation = true;
 
-        EnsureVisualChild();
+        if (sprite == null) sprite = GetComponent<SpriteRenderer>();
+        if (sprite != null) baseColor = sprite.color;
+        else enableAngerTint = false;
 
-        sr = visual.GetComponent<SpriteRenderer>();
-        if (sr == null)
-        {
-            Debug.LogError("[BabyController] Visual has no SpriteRenderer.");
-            enabled = false;
-            return;
-        }
+        if (captureCalmScaleOnStart)
+            calmScale = transform.localScale;
 
-        visualOriginalLocalPos = visual.localPosition;
+        currentScale = transform.localScale;
+
         PickNewWanderDir();
-    }
-
-    private void EnsureVisualChild()
-    {
-        if (visual != null) return;
-
-        Transform found = transform.Find("Visual");
-        if (found != null)
-        {
-            visual = found;
-            return;
-        }
-
-        GameObject v = new GameObject("Visual");
-        v.transform.SetParent(transform);
-        v.transform.localPosition = Vector3.zero;
-        v.transform.localRotation = Quaternion.identity;
-        v.transform.localScale = Vector3.one;
-        visual = v.transform;
-
-        // Copy sprite renderer from parent if any, then disable parent renderer
-        SpriteRenderer parentSR = GetComponent<SpriteRenderer>();
-        SpriteRenderer childSR = v.AddComponent<SpriteRenderer>();
-
-        if (parentSR != null)
-        {
-            childSR.sprite = parentSR.sprite;
-            childSR.color = parentSR.color;
-            childSR.flipX = parentSR.flipX;
-            childSR.flipY = parentSR.flipY;
-            childSR.sortingLayerID = parentSR.sortingLayerID;
-            childSR.sortingOrder = parentSR.sortingOrder;
-            childSR.material = parentSR.sharedMaterial;
-
-            parentSR.enabled = false;
-        }
-        else
-        {
-            // If you had no SpriteRenderer on the parent, at least show something
-            childSR.color = Color.white;
-        }
-    }
-
-    private void Update()
-    {
-        // Anger increases over time; external events ONLY affect multiplier (and Calm can reduce anger too)
-        anger += baseAngerRate * multiplier * Time.deltaTime;
-        anger = Mathf.Clamp(anger, 0f, maxAnger);
-
-        float t = anger / maxAnger;
-
-        // Size + color based on anger
-        float scale = Mathf.Lerp(minScale, maxScale, t);
-        visual.localScale = new Vector3(scale, scale, 1f);
-        sr.color = Color.Lerp(calmColor, angryColor, t);
-
-        // Wander direction refresh
-        wanderTimer += Time.deltaTime;
-        if (wanderTimer >= wanderChangeInterval)
-            PickNewWanderDir();
-
-        // Shake (funny jitter) on Visual ONLY, intensity scales with anger
-        if (isShaking)
-        {
-            float dynamicIntensity = shakeIntensity * Mathf.Lerp(0.2f, 1.0f, t);
-
-            float offsetX = Mathf.Sin(Time.time * shakeSpeed) * dynamicIntensity;
-            float offsetY = Mathf.Cos(Time.time * shakeSpeed * 1.3f) * dynamicIntensity; // goofy uneven wobble
-
-            visual.localPosition = visualOriginalLocalPos + new Vector3(offsetX, offsetY, 0f);
-        }
-        else
-        {
-            visual.localPosition = visualOriginalLocalPos;
-        }
-
-        // Micro-polish: cartoony bounce when very angry
-        if (anger > 70f)
-        {
-            float bounce = 1f + Mathf.Sin(Time.time * 18f) * 0.03f;
-            visual.localScale *= bounce;
-        }
+        wanderTimer = Random.Range(wanderChangeMin, wanderChangeMax);
     }
 
     private void FixedUpdate()
     {
-        float t = anger / maxAnger;
+        // Anger increases only with time
+        anger = Mathf.Clamp(anger + baseAngerRate * angerMultiplier * Time.fixedDeltaTime, 0f, maxAnger);
+        float anger01 = Mathf.Clamp01(anger / Mathf.Max(maxAnger, 0.0001f));
 
-        // Speed ramp: slow early, fast late
-        float speedT = t * t;
-        float speed = Mathf.Lerp(baseSpeed, maxSpeed, speedT);
+        // Speed ramp
+        float speed = Mathf.Lerp(baseSpeed, maxSpeed, anger01 * anger01);
 
-        // ============================================================
-        // TODO (LATER): Pathfinding to breakable objects
-        //
-        // When you have breakable objects + a pathfinding system:
-        // 1) Find a target breakable (closest, highest priority, etc.)
-        //    Example: Transform target = breakableProvider.GetTarget();
-        //
-        // 2) Compute a path to target (NavMesh, A*, grid, etc.)
-        //    Example: Vector2 desiredDir = pathfinder.GetNextDirection(transform.position, target.position);
-        //
-        // 3) Replace wanderDir with the path direction:
-        //    wanderDir = desiredDir.normalized;
-        //
-        // For now: wander randomly.
-        // ============================================================
-
-        rb.linearVelocity = wanderDir * speed;
-
-        // Keep inside bounds; if we hit a wall, bounce by choosing a new direction
-        Vector2 p = rb.position;
-        bool hitWall = false;
-
-        if (p.x < minX) { p.x = minX; hitWall = true; }
-        else if (p.x > maxX) { p.x = maxX; hitWall = true; }
-
-        if (p.y < minY) { p.y = minY; hitWall = true; }
-        else if (p.y > maxY) { p.y = maxY; hitWall = true; }
-
-        if (hitWall)
+        // Update wander direction timer
+        wanderTimer -= Time.fixedDeltaTime;
+        if (wanderTimer <= 0f)
         {
-            rb.position = p;
             PickNewWanderDir();
+            wanderTimer = Random.Range(wanderChangeMin, wanderChangeMax);
         }
+
+        // Decide search radius based on anger
+        float searchRadius =
+            (anger >= rageThreshold) ? rageSearchRadius :
+            (anger >= calmThreshold)
+                ? Mathf.Lerp(calmSearchRadius, rageSearchRadius, Mathf.InverseLerp(calmThreshold, rageThreshold, anger))
+                : calmSearchRadius;
+
+        // Give up target if it drifted too far from our “current mood radius”
+        if (breakTarget != null)
+        {
+            float dist = Vector2.Distance(rb.position, breakTarget.position);
+            if (dist > searchRadius * giveUpDistanceMultiplier)
+                breakTarget = null;
+        }
+
+        // Retarget periodically (or if no target)
+        retargetTimer -= Time.fixedDeltaTime;
+        if (retargetTimer <= 0f)
+        {
+            retargetTimer = retargetCooldown;
+
+            bool canAcquire =
+                (anger >= calmThreshold) || (anger < calmThreshold && searchRadius <= calmSearchRadius + 0.001f);
+
+            if (breakTarget == null && canAcquire)
+                breakTarget = FindClosestBreakable(searchRadius);
+        }
+
+        // Movement direction: commit to target if we have one
+        Vector2 desiredDir;
+
+        if (breakTarget != null)
+        {
+            Vector2 toTarget = (Vector2)breakTarget.position - rb.position;
+            float dist = toTarget.magnitude;
+
+            desiredDir = dist > 0.001f ? (toTarget / dist) : wanderDir;
+
+            // “Stick” near it so we keep colliding
+            if (dist <= stopDistance)
+                desiredDir = dist > 0.001f ? (toTarget / dist) : desiredDir;
+        }
+        else
+        {
+            desiredDir = wanderDir;
+        }
+
+        // Avoid walls/furniture (NOT breakables)
+        Vector2 finalDir = AvoidObstacles(desiredDir);
+
+        rb.linearVelocity = finalDir * speed;
+
+        // Anti-stuck
+        if (rb.linearVelocity.magnitude < stuckSpeedThreshold)
+        {
+            stuckTimer += Time.fixedDeltaTime;
+            if (stuckTimer >= stuckTimeToRecover)
+            {
+                PickNewWanderDir();
+                breakTarget = null;
+                retargetTimer = 0f;
+                stuckTimer = 0f;
+            }
+        }
+        else stuckTimer = 0f;
+    }
+
+    private void LateUpdate()
+    {
+        float anger01 = Mathf.Clamp01(anger / Mathf.Max(maxAnger, 0.0001f));
+
+        if (enableAngerTint && sprite != null)
+            sprite.color = Color.Lerp(baseColor, angryColor, anger01);
+
+        float sizeMul = enableAngerScale ? (1f + maxScaleBonus * anger01) : 1f;
+
+        float jitter = 0f;
+        if (enableShaking && anger >= shakeThreshold)
+            jitter = Mathf.Sin(Time.time * shakeSpeed) * (maxShakeScaleJitter * anger01);
+
+        Vector3 targetScale = calmScale * (sizeMul * (1f + jitter));
+
+        if (scaleSmooth <= 0f)
+        {
+            currentScale = targetScale;
+        }
+        else
+        {
+            currentScale = Vector3.Lerp(currentScale, targetScale, scaleSmooth * Time.deltaTime);
+        }
+
+        transform.localScale = currentScale;
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        // Keep damaging while pushing it
+        if (Time.time - lastDamageTime < hitCooldown) return;
+
+        BreakableObject breakable = collision.collider.GetComponent<BreakableObject>();
+        if (breakable == null) return;
+
+        float angerRatio = Mathf.Clamp01(anger / Mathf.Max(maxAnger, 0.0001f));
+        angerRatio *= angerRatio; // strong curve
+        float damage = Mathf.Lerp(minDamage, maxDamageAtFullAnger, angerRatio);
+
+        breakable.TakeDamage(damage);
+        lastDamageTime = Time.time;
+
+        // Commit: if we hit a breakable, make it our target
+        if (breakTarget == null)
+            breakTarget = breakable.transform;
+    }
+
+    // Multiplier control
+    public void IncreaseAngerMultiplier(float amount)
+        => angerMultiplier = Mathf.Clamp(angerMultiplier + Mathf.Abs(amount), minMultiplier, maxMultiplier);
+
+    public void DecreaseAngerMultiplier(float amount)
+        => angerMultiplier = Mathf.Clamp(angerMultiplier - Mathf.Abs(amount), minMultiplier, maxMultiplier);
+
+    public void SetAngerMultiplier(float value)
+        => angerMultiplier = Mathf.Clamp(value, minMultiplier, maxMultiplier);
+
+    // ONLY method allowed to reduce anger directly
+    public void CalmBaby(float amount)
+        => anger = Mathf.Clamp(anger - Mathf.Abs(amount), 0f, maxAnger);
+
+    // -------- Helpers --------
+
+    private Transform FindClosestBreakable(float radius)
+    {
+        var hits = Physics2D.OverlapCircleAll(rb.position, radius, breakableMask);
+
+        Transform best = null;
+        float bestDistSqr = float.PositiveInfinity;
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            var tr = hits[i].transform;
+            if (tr.GetComponent<BreakableObject>() == null) continue;
+
+            float d = ((Vector2)tr.position - rb.position).sqrMagnitude;
+            if (d < bestDistSqr)
+            {
+                bestDistSqr = d;
+                best = tr;
+            }
+        }
+
+        return best;
+    }
+
+    private Vector2 AvoidObstacles(Vector2 desiredDir)
+    {
+        if (desiredDir.sqrMagnitude < 0.0001f)
+            return desiredDir;
+
+        desiredDir.Normalize();
+        Vector2 origin = rb.position;
+
+        var forwardHit = Physics2D.Raycast(origin, desiredDir, avoidDistance, obstacleMask);
+
+        Vector2 leftDir = Rotate(desiredDir, sideRayAngle);
+        Vector2 rightDir = Rotate(desiredDir, -sideRayAngle);
+
+        var leftHit = Physics2D.Raycast(origin, leftDir, avoidDistance * sideRayScale, obstacleMask);
+        var rightHit = Physics2D.Raycast(origin, rightDir, avoidDistance * sideRayScale, obstacleMask);
+
+        if (!forwardHit && !leftHit && !rightHit)
+            return desiredDir;
+
+        Vector2 avoid = Vector2.zero;
+        if (forwardHit) avoid += forwardHit.normal;
+        if (leftHit) avoid += leftHit.normal * 0.8f;
+        if (rightHit) avoid += rightHit.normal * 0.8f;
+
+        if (avoid.sqrMagnitude < 0.0001f)
+            avoid = new Vector2(-desiredDir.y, desiredDir.x);
+
+        return (desiredDir + avoid.normalized * avoidStrength).normalized;
     }
 
     private void PickNewWanderDir()
     {
-        wanderTimer = 0f;
         wanderDir = Random.insideUnitCircle.normalized;
-        if (wanderDir.sqrMagnitude < 0.01f)
+        if (wanderDir.sqrMagnitude < 0.0001f)
             wanderDir = Vector2.right;
     }
 
-    // Objects / events call this to make baby escalate faster (adds to multiplier)
-    public void AddFlatAnger(float amount)
+    private static Vector2 Rotate(Vector2 v, float degrees)
     {
-        multiplier = Mathf.Clamp(multiplier + amount, 1f, maxMultiplier);
+        float rad = degrees * Mathf.Deg2Rad;
+        float sin = Mathf.Sin(rad);
+        float cos = Mathf.Cos(rad);
+        return new Vector2(cos * v.x - sin * v.y, sin * v.x + cos * v.y);
     }
-
-    // Calm lowers multiplier
-    public void CalmBaby(float amount)
-    {
-        multiplier = Mathf.Clamp(multiplier - amount, 1f, maxMultiplier);
-    }
-
-    // Calm zone can also lower the anger value directly
-    public void ReduceAnger(float amount)
-    {
-        anger = Mathf.Clamp(anger - amount, 0f, maxAnger);
-    }
-
-    public void SetShaking(bool value) => isShaking = value;
-
-    // Debug helpers
-    public float Anger01 => anger / maxAnger;
-    public float Multiplier => multiplier;
 }

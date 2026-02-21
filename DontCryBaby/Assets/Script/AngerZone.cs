@@ -9,8 +9,7 @@ public class AngerZone : MonoBehaviour
         var baby = other.GetComponent<BabyController>();
         if (baby == null) return;
 
-        baby.AddFlatAnger(angerMultiplierPerSecond * Time.deltaTime);
-        baby.SetShaking(true);
+        baby.IncreaseAngerMultiplier(angerMultiplierPerSecond * Time.deltaTime);
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -18,6 +17,5 @@ public class AngerZone : MonoBehaviour
         var baby = other.GetComponent<BabyController>();
         if (baby == null) return;
 
-        baby.SetShaking(false);
     }
 }

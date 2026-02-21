@@ -10,10 +10,8 @@ public class CalmZone : MonoBehaviour
         var baby = other.GetComponent<BabyController>();
         if (baby == null) return;
 
-        baby.CalmBaby(calmMultiplierPerSecond * Time.deltaTime);
-        baby.ReduceAnger(calmAngerPerSecond * Time.deltaTime);
+        baby.CalmBaby(calmAngerPerSecond * Time.deltaTime);
+        baby.DecreaseAngerMultiplier(calmMultiplierPerSecond * Time.deltaTime);
 
-        // Funny: calm zone makes baby "stable"
-        baby.SetShaking(false);
     }
 }
