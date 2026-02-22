@@ -288,7 +288,28 @@ public class BabyController : MonoBehaviour
 
     // ONLY method allowed to reduce anger directly
     public void CalmBaby(float amount)
-        => anger = Mathf.Clamp(anger - Mathf.Abs(amount), 0f, maxAnger);
+    {
+        Debug.Log("---- CalmBaby called ----");
+
+        Debug.Log("Anger BEFORE: " + anger);
+        Debug.Log("Amount received: " + amount);
+
+        float absoluteAmount = Mathf.Abs(amount);
+        Debug.Log("Absolute amount: " + absoluteAmount);
+
+        float newAnger = anger - absoluteAmount;
+        Debug.Log("After subtraction (before clamp): " + newAnger);
+
+        float clampedAnger = Mathf.Clamp(newAnger, 0f, maxAnger);
+        Debug.Log("After clamp: " + clampedAnger);
+
+        anger = clampedAnger;
+        
+        breakTarget = null;
+
+        Debug.Log("Anger AFTER: " + anger);
+        Debug.Log("--------------------------");
+    }
 
     // -------- Helpers --------
     

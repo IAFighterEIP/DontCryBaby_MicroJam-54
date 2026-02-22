@@ -43,6 +43,7 @@ public class LevelTimer : MonoBehaviour
 
         if (ElapsedSeconds >= gameDurationSeconds)
         {
+            Debug.Log(ElapsedSeconds);
             ElapsedSeconds = gameDurationSeconds;
             EndGame();
         }

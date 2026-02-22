@@ -14,4 +14,8 @@ public class MainMenuUI : MonoBehaviour
         Debug.Log("Quit button clicked!");
         Application.Quit();
     }
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
 }

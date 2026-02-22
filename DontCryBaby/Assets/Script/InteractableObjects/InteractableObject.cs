@@ -117,7 +117,10 @@ public abstract class InteractableObject : MonoBehaviour
         SetVisualActive(true);
 
         if (sound != null)
+        {
+            audioSource.volume = 0.3f;
             audioSource.PlayOneShot(sound);
+        }
 
         canInteract = true;
 
