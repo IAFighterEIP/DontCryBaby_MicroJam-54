@@ -1648,19 +1648,84 @@ PrefabInstance:
       propertyPath: m_Name
       value: Television
       objectReference: {fileID: 0}
-    - target: {fileID: 7951616853690224970, guid: 784525f2dac584c438ba9a13b58595c5, type: 3}
-      propertyPath: m_SortingLayer
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7951616853690224970, guid: 784525f2dac584c438ba9a13b58595c5, type: 3}
-      propertyPath: m_SortingLayerID
-      value: 961637921
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 784525f2dac584c438ba9a13b58595c5, type: 3}
+--- !u!1001 &1819363287
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 330934860037820071, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_SortingLayer
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 330934860037820071, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 603699453
+      objectReference: {fileID: 0}
+    - target: {fileID: 1118829658975759150, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_Name
+      value: Baby
+      objectReference: {fileID: 0}
+    - target: {fileID: 3682952661547934312, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3682952661547934312, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3682952661547934312, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.66
+      objectReference: {fileID: 0}
+    - target: {fileID: 3682952661547934312, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.52
+      objectReference: {fileID: 0}
+    - target: {fileID: 3682952661547934312, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3682952661547934312, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3682952661547934312, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3682952661547934312, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3682952661547934312, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3682952661547934312, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3682952661547934312, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3682952661547934312, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4c9e433031105b9458226fdac7ba4c09, type: 3}
 --- !u!1001 &1834841895
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2352,14 +2417,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: MobilePhone
       objectReference: {fileID: 0}
-    - target: {fileID: 7951616853690224970, guid: bd25f952901ffe64c9efa3929c1d8e7f, type: 3}
-      propertyPath: m_SortingLayer
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7951616853690224970, guid: bd25f952901ffe64c9efa3929c1d8e7f, type: 3}
-      propertyPath: m_SortingLayerID
-      value: 961637921
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2449,3 +2506,4 @@ SceneRoots:
   - {fileID: 2142695173}
   - {fileID: 921476590}
   - {fileID: 1470029881}
+  - {fileID: 1819363287}

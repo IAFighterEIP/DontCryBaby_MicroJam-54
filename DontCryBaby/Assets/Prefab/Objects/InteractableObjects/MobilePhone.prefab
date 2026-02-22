@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1662338967581297276}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ProgressBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5259510871078942535}
   - component: {fileID: 2391061975082671838}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Dialog
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -103,7 +103,7 @@ GameObject:
   - component: {fileID: 7951616853690224970}
   - component: {fileID: -6804657211853263531}
   - component: {fileID: 1596185568139423497}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MobilePhone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -171,8 +171,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 961637921
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -205,6 +205,7 @@ MonoBehaviour:
   triggerBabyCooldown: 5
   canInteract: 1
   triggerMultiplier: 0.3
+  alwaysDisplayed: 1
   progressBarParent: {fileID: 1662338967581297276}
   segmentPrefab: {fileID: 1915684018302189458, guid: 6bc78496391f52d48a063ad68e5c0391, type: 3}
   progressBarWidth: 1
@@ -269,7 +270,7 @@ GameObject:
   - component: {fileID: 4650747021594511378}
   - component: {fileID: 1771106373701475256}
   - component: {fileID: 7015012238134478871}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: DialogText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
