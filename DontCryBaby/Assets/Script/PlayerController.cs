@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -5,12 +6,19 @@ public class PlayerController : MonoBehaviour
     public float speed = 5f;
     public float interactRange = 1.5f;
 
+    [Header("References")]
+    [SerializeField] private PlayerHands playerHands;
+    [SerializeField] private TextMeshProUGUI promptText;
+
     private Rigidbody2D rb;
     private Vector2 movement;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        if (playerHands == null)
+            playerHands = GetComponent<PlayerHands>();
     }
 
     void Update()
@@ -30,6 +38,8 @@ public class PlayerController : MonoBehaviour
         {
             TryInteract();
         }
+        
+        UpdatePrompt();
     }
 
     void FixedUpdate()
@@ -41,30 +51,104 @@ public class PlayerController : MonoBehaviour
     {
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, interactRange);
 
-        InteractableObject closest = null;
+        ItemInteractable closestItem = null;
+        InteractableObject closestTask = null;
+
         float minDistance = Mathf.Infinity;
 
         foreach (Collider2D hit in hits)
         {
             if (hit.gameObject == gameObject)
-                continue; // éviter de collide avec le babysitter
+                continue;
 
-            var component = hit.GetComponent<MonoBehaviour>();
-            if (component is InteractableObject interactable && interactable.canInteract)
+            float distance = Vector2.Distance(transform.position, hit.transform.position);
+            if (distance > minDistance)
+                continue;
+
+            // FIRST: Check for item-based interaction
+            var itemObj = hit.GetComponent<ItemInteractable>();
+            if (itemObj != null)
             {
-                float distance = Vector2.Distance(transform.position, hit.transform.position);
+                closestItem = itemObj;
+                closestTask = null;
+                minDistance = distance;
+                continue;
+            }
 
-                if (distance < minDistance)
-                {
-                    minDistance = distance;
-                    closest = interactable;
-                }
+            // SECOND: Check for task-based interaction
+            var taskObj = hit.GetComponent<InteractableObject>();
+            if (taskObj != null && taskObj.canInteract)
+            {
+                closestTask = taskObj;
+                closestItem = null;
+                minDistance = distance;
             }
         }
 
-        if (closest != null)
+        // Execute interaction
+        if (closestItem != null)
         {
-            closest.Interact();
+            closestItem.Interact(playerHands);
+            return;
+        }
+
+        if (closestTask != null)
+        {
+            closestTask.Interact();
+            return;
+        }
+    }
+    
+    void UpdatePrompt()
+    {
+        if (promptText == null)
+            return;
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, interactRange);
+
+        ItemInteractable closestItem = null;
+        InteractableObject closestTask = null;
+
+        float minDistance = Mathf.Infinity;
+
+        foreach (Collider2D hit in hits)
+        {
+            if (hit.gameObject == gameObject)
+                continue;
+
+            float distance = Vector2.Distance(transform.position, hit.transform.position);
+            if (distance > minDistance)
+                continue;
+
+            var itemObj = hit.GetComponent<ItemInteractable>();
+            if (itemObj != null)
+            {
+                closestItem = itemObj;
+                closestTask = null;
+                minDistance = distance;
+                continue;
+            }
+
+            var taskObj = hit.GetComponent<InteractableObject>();
+            if (taskObj != null && taskObj.canInteract)
+            {
+                closestTask = taskObj;
+                closestItem = null;
+                minDistance = distance;
+            }
+        }
+
+        if (closestItem != null)
+        {
+            promptText.text = $"<color=yellow>[E]</color> {closestItem.GetPrompt(playerHands)}";
+        }
+        else if (closestTask != null)
+        {
+            promptText.text = "[E] Interact";
+        }
+        else
+        {
+            promptText.text = "";
         }
     }
 }

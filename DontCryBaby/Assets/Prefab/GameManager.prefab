@@ -176,7 +176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d8d13df4e272ce4c89b932ace5a2b52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelTimer
-  gameDurationSeconds: 30
+  gameDurationSeconds: 60
   displayStartMinutes: 20
   displayStartSeconds: 0
   displayEndMinutes: 23

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2943906424619944858}
   - component: {fileID: 748936482302511646}
   - component: {fileID: 4901691598064969480}
+  - component: {fileID: 490010080220813553}
   m_Layer: 0
   m_Name: Baby
   m_TagString: Untagged
@@ -30,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5200835071600694834}
@@ -80,8 +81,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 603699453
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: -4165631466875261612, guid: 5c2a2cdfe1af29e43badc248a0ebd30e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -238,6 +239,24 @@ MonoBehaviour:
   cryIntervalHigh: {x: 0.2, y: 0.35}
   pitchRange: {x: 0.95, y: 1.05}
   volumeRange: {x: 0.9, y: 1}
+--- !u!114 &490010080220813553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118829658975759150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12edccb4e2c84c74b881dc72a68666f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BabyItemReceiver
+  dialogText: {fileID: 0}
+  defaultMessage: 
+  harmBiberon: {fileID: 11400000, guid: 8aaada5ba4c4c284885da9b71b1742db, type: 2}
+  baby: {fileID: 4901691598064969480}
+  angerMultiplierDecrease: 2
+  angerCalm: 50
 --- !u!1 &3725501461236469467
 GameObject:
   m_ObjectHideFlags: 0
