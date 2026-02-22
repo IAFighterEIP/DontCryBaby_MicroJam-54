@@ -67,7 +67,38 @@ public class BabyController : MonoBehaviour
     [SerializeField] private bool captureCalmScaleOnStart = true;
     [SerializeField] private Vector3 calmScale = Vector3.one;
     [SerializeField] private float scaleSmooth = 18f; // set 0 for instant
+    
+    
+    [Header("Audio - Baby Vocal")]
+    [SerializeField] private AudioSource vocalSource; // assign or auto-get
 
+    [Tooltip("Played when anger < happyToCryAnger")]
+    [SerializeField] private AudioClip[] happyClips;
+
+    [Tooltip("Played when anger >= happyToCryAnger")]
+    [SerializeField] private AudioClip[] cryClips;
+
+    [SerializeField] private float happyToCryAnger = 40f;
+
+    [Header("Audio - Timing")]
+    [Tooltip("Happy sounds interval range (seconds).")]
+    [SerializeField] private Vector2 happyInterval = new Vector2(2.0f, 4.0f);
+
+    [Tooltip("Crying interval range at LOW cry anger (just above threshold).")]
+    [SerializeField] private Vector2 cryIntervalLow = new Vector2(0.8f, 1.2f);
+
+    [Tooltip("Crying interval range at MAX anger (most annoying).")]
+    [SerializeField] private Vector2 cryIntervalHigh = new Vector2(0.2f, 0.35f);
+
+    [Tooltip("Random pitch range for variety.")]
+    [SerializeField] private Vector2 pitchRange = new Vector2(0.95f, 1.05f);
+
+    [Tooltip("Random volume multiplier range for variety.")]
+    [SerializeField] private Vector2 volumeRange = new Vector2(0.9f, 1.0f);
+
+    private float nextVocalTime = 0f;
+    private int lastHappyIndex = -1;
+    private int lastCryIndex = -1;
     private Rigidbody2D rb;
 
     private Transform breakTarget;
@@ -97,6 +128,19 @@ public class BabyController : MonoBehaviour
 
         PickNewWanderDir();
         wanderTimer = Random.Range(wanderChangeMin, wanderChangeMax);
+        
+        if (vocalSource == null)
+            vocalSource = GetComponent<AudioSource>();
+
+        // If still null, auto-add one so it "just works"
+        if (vocalSource == null)
+            vocalSource = gameObject.AddComponent<AudioSource>();
+
+        vocalSource.playOnAwake = false;
+        vocalSource.loop = false;
+
+        // Schedule first vocal
+        nextVocalTime = Time.time + Random.Range(0.1f, 0.4f);
     }
 
     private void FixedUpdate()
@@ -208,6 +252,8 @@ public class BabyController : MonoBehaviour
         }
 
         transform.localScale = currentScale;
+        
+        UpdateVocalSounds();
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -245,6 +291,69 @@ public class BabyController : MonoBehaviour
         => anger = Mathf.Clamp(anger - Mathf.Abs(amount), 0f, maxAnger);
 
     // -------- Helpers --------
+    
+    private void UpdateVocalSounds()
+    {
+        if (vocalSource == null) return;
+        if (Time.time < nextVocalTime) return;
+
+        bool isCrying = anger >= happyToCryAnger;
+
+        if (isCrying)
+        {
+            if (cryClips == null || cryClips.Length == 0)
+            {
+                nextVocalTime = Time.time + 0.5f;
+                return;
+            }
+
+            // 0 at threshold, 1 at max anger
+            float t = Mathf.InverseLerp(happyToCryAnger, maxAnger, anger);
+
+            // Crying gets faster with anger by blending interval ranges
+            float minI = Mathf.Lerp(cryIntervalLow.x, cryIntervalHigh.x, t);
+            float maxI = Mathf.Lerp(cryIntervalLow.y, cryIntervalHigh.y, t);
+
+            PlayRandomFrom(cryClips, ref lastCryIndex);
+
+            nextVocalTime = Time.time + Random.Range(minI, maxI);
+        }
+        else
+        {
+            if (happyClips == null || happyClips.Length == 0)
+            {
+                nextVocalTime = Time.time + 1.0f;
+                return;
+            }
+
+            // Happy can also speed up slightly as anger rises (optional)
+            float t = Mathf.InverseLerp(0f, happyToCryAnger, anger);
+            float minI = Mathf.Lerp(happyInterval.y, happyInterval.x, t); // slightly faster near threshold
+            float maxI = Mathf.Lerp(happyInterval.y, happyInterval.x, t);
+
+            PlayRandomFrom(happyClips, ref lastHappyIndex);
+
+            nextVocalTime = Time.time + Random.Range(minI, maxI);
+        }
+    }
+
+    private void PlayRandomFrom(AudioClip[] clips, ref int lastIndex)
+    {
+        if (clips == null || clips.Length == 0) return;
+
+        int index = Random.Range(0, clips.Length);
+
+        // Avoid immediate repeat when possible
+        if (clips.Length > 1 && index == lastIndex)
+            index = (index + 1 + Random.Range(0, clips.Length - 1)) % clips.Length;
+
+        lastIndex = index;
+
+        vocalSource.pitch = Random.Range(pitchRange.x, pitchRange.y);
+        vocalSource.volume = Mathf.Clamp01(Random.Range(volumeRange.x, volumeRange.y));
+
+        vocalSource.PlayOneShot(clips[index]);
+    }
 
     private Transform FindClosestBreakable(float radius)
     {
