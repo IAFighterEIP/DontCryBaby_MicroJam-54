@@ -182,7 +182,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
   anger: 0
   maxAnger: 100
-  baseAngerRate: 3
+  baseAngerRate: 2
   angerMultiplier: 1
   minMultiplier: 1
   maxMultiplier: 6
@@ -190,7 +190,7 @@ MonoBehaviour:
   maxSpeed: 6
   wanderChangeMin: 0.6
   wanderChangeMax: 1.4
-  calmThreshold: 20
+  calmThreshold: 30
   rageThreshold: 50
   calmSearchRadius: 2.5
   rageSearchRadius: 10

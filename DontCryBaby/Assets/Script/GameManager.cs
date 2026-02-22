@@ -12,9 +12,22 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject endPanel;
     [SerializeField] private TMP_Text scoreText;
 
+    private GameObject EndUI;
+
     private void Awake()
     {
         timer.OnTimeUp += HandleTimeUp;
+
+        EndUI = GameObject.Find("Canvas");
+
+        if (EndUI != null) {
+            GameObject exitButtonObj = EndUI.transform.Find("ExitButton")?.gameObject;
+            GameObject playButtonObj = EndUI.transform.Find("PlayButton")?.gameObject;
+            GameObject ScoreObj = EndUI.transform.Find("ScoreText")?.gameObject;
+            exitButtonObj?.SetActive(false);
+            playButtonObj?.SetActive(false);
+            ScoreObj?.SetActive(false);
+        }
     }
 
     private void OnDestroy()
@@ -41,5 +54,24 @@ public class GameManager : MonoBehaviour
 
         // 5️⃣ Freeze game
         Time.timeScale = 0f;
+
+        // 6️⃣ Show cursor and End UI
+        Cursor.visible = true;
+        if (EndUI != null) {
+            GameObject exitButtonObj = EndUI.transform.Find("ExitButton")?.gameObject;
+            GameObject playButtonObj = EndUI.transform.Find("PlayButton")?.gameObject;
+            GameObject ScoreObj = EndUI.transform.Find("ScoreText")?.gameObject;
+
+            if (exitButtonObj != null)
+                exitButtonObj.SetActive(true);
+            if (playButtonObj != null)
+                playButtonObj.SetActive(true);
+            if (ScoreObj != null) {
+                ScoreObj.GetComponent<TMP_Text>().text = "Score: " + finalScore.ToString("0");
+                ScoreObj.SetActive(true);
+            }
+        }
+
+        Debug.Log("Time's up! Final Score: " + finalScore);
     }
 }

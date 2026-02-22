@@ -182,7 +182,7 @@ public class BabyController : MonoBehaviour
             retargetTimer = retargetCooldown;
 
             bool canAcquire =
-                (anger >= calmThreshold) || (anger < calmThreshold && searchRadius <= calmSearchRadius + 0.001f);
+                (anger >= calmThreshold/*) || (anger < calmThreshold && searchRadius <= calmSearchRadius + 0.001f*/);
 
             if (breakTarget == null && canAcquire)
                 breakTarget = FindClosestBreakable(searchRadius);
