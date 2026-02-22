@@ -59,8 +59,33 @@ public abstract class InteractableObject : MonoBehaviour
     private AudioClip sound;
     private AudioSource audioSource;
 
+    [Header("Shake Settings")]
+    [SerializeField]
+    private float shakeAmplitude = 0.05f;
+
+    [SerializeField]
+    private float shakeSpeed = 25f;
+
+    private Vector3 originalLocalPos;
+    private bool isShaking = false;
+
+    [Header("Sprites")]
+    [SerializeField]
+    private Sprite defaultSprite;
+
+    [SerializeField]
+    private Sprite interactableSprite;
+
+    private SpriteRenderer spriteRenderer;
+
     void Start()
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+
+        if (spriteRenderer != null && defaultSprite != null)
+        {
+            spriteRenderer.sprite = defaultSprite;
+        }
         CreateProgressBar();
         if (dialogText != null)
             dialogText.text = defaultMessage;
@@ -75,6 +100,9 @@ public abstract class InteractableObject : MonoBehaviour
         SetVisualActive(false);
         canInteract = false;
 
+        UpdateSpriteState();
+
+        originalLocalPos = transform.localPosition;
         baby = FindObjectOfType<BabyController>();
 
         StartCoroutine(InitialSpawnRoutine());
@@ -93,22 +121,50 @@ public abstract class InteractableObject : MonoBehaviour
 
         canInteract = true;
 
+        UpdateSpriteState();
+
         angerTimer = 0f;
     }
 
     void Update()
     {
-        if (!canInteract || !IsVisible())
-            return;
-
-        angerTimer += Time.deltaTime;
-
-        if (angerTimer >= triggerBabyCooldown)
+        if (canInteract && IsVisible())
         {
-            Debug.Log("Baby gets angrier!");
-            if (sound != null)
-                audioSource.PlayOneShot(sound);
-            angerTimer = 0f;
+            angerTimer += Time.deltaTime;
+
+            if (angerTimer >= triggerBabyCooldown)
+            {
+                Debug.Log("Baby gets angrier!");
+                if (sound != null)
+                    audioSource.PlayOneShot(sound);
+                angerTimer = 0f;
+            }
+        }
+        HandleShake();
+    }
+
+    void HandleShake()
+    {
+        if (canInteract && IsVisible())
+        {
+            if (!isShaking)
+            {
+                originalLocalPos = transform.localPosition;
+                isShaking = true;
+            }
+
+            float offsetX = Mathf.Sin(Time.time * shakeSpeed) * shakeAmplitude;
+            float offsetY = Mathf.Cos(Time.time * shakeSpeed) * shakeAmplitude;
+
+            transform.localPosition = originalLocalPos + new Vector3(offsetX, offsetY, 0f);
+        }
+        else
+        {
+            if (isShaking)
+            {
+                transform.localPosition = originalLocalPos;
+                isShaking = false;
+            }
         }
     }
 
@@ -179,9 +235,22 @@ public abstract class InteractableObject : MonoBehaviour
         }
     }
 
+    void UpdateSpriteState()
+    {
+        if (spriteRenderer == null)
+            return;
+
+        if (canInteract)
+            spriteRenderer.sprite = interactableSprite;
+        else
+            spriteRenderer.sprite = defaultSprite;
+    }
+
     private System.Collections.IEnumerator CompleteAndCooldownRoutine()
     {
         canInteract = false;
+
+        UpdateSpriteState();
 
         CompleteInteraction();
 
@@ -208,6 +277,8 @@ public abstract class InteractableObject : MonoBehaviour
             dialogText.text = defaultMessage;
 
         canInteract = true;
+
+        UpdateSpriteState();
     }
 
     private System.Collections.IEnumerator ActionCooldownRoutine()
