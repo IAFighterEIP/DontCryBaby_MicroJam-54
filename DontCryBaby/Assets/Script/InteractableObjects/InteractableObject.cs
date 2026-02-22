@@ -110,7 +110,7 @@ public abstract class InteractableObject : MonoBehaviour
 
     private System.Collections.IEnumerator InitialSpawnRoutine()
     {
-        float delay = Random.Range(15, 45);
+        float delay = Random.Range(10, 40);
 
         yield return new WaitForSeconds(delay);
 

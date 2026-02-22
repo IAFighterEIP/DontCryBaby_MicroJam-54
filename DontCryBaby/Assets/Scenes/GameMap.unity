@@ -171,6 +171,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: AntiVision Square (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7939606180152833648, guid: 29e997222be20694e9964cfc7259f81a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -698,6 +702,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: AntiVision Square (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 7939606180152833648, guid: 29e997222be20694e9964cfc7259f81a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1148,6 +1156,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2603760318024932852, guid: 9195f3ccd5d89094cacbf4b53239d95f, type: 3}
     - target: {fileID: -6804657211853263531, guid: 700a8b38b5089ad409e5774860df113d, type: 3}
+      propertyPath: eventCooldown
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: -6804657211853263531, guid: 700a8b38b5089ad409e5774860df113d, type: 3}
       propertyPath: defaultMessage
       value: Press E to wash the dishes
       objectReference: {fileID: 0}
@@ -1440,6 +1452,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: AntiVision Square
       objectReference: {fileID: 0}
+    - target: {fileID: 7939606180152833648, guid: 29e997222be20694e9964cfc7259f81a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1534,6 +1550,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3547035152486589062, guid: e7b7d9bb5457d4a4587b758a04af56c0, type: 3}
+      propertyPath: gameDurationSeconds
+      value: 60
+      objectReference: {fileID: 0}
     - target: {fileID: 3755930490009671997, guid: e7b7d9bb5457d4a4587b758a04af56c0, type: 3}
       propertyPath: m_Name
       value: GameManager
@@ -1899,6 +1919,10 @@ PrefabInstance:
       propertyPath: defaultSprite
       value: 
       objectReference: {fileID: 3513872992439462719, guid: 9195f3ccd5d89094cacbf4b53239d95f, type: 3}
+    - target: {fileID: -6804657211853263531, guid: 784525f2dac584c438ba9a13b58595c5, type: 3}
+      propertyPath: eventCooldown
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: -6804657211853263531, guid: 784525f2dac584c438ba9a13b58595c5, type: 3}
       propertyPath: defaultMessage
       value: Press E to put the cartoon back on TV
@@ -2495,6 +2519,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -4615964149980311267, guid: 9195f3ccd5d89094cacbf4b53239d95f, type: 3}
     - target: {fileID: -6804657211853263531, guid: 75085ca41dc50a84abc9798f50120987, type: 3}
+      propertyPath: eventCooldown
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: -6804657211853263531, guid: 75085ca41dc50a84abc9798f50120987, type: 3}
       propertyPath: defaultMessage
       value: Press E to get the package
       objectReference: {fileID: 0}
@@ -2720,6 +2748,10 @@ PrefabInstance:
       propertyPath: defaultSprite
       value: 
       objectReference: {fileID: 1650294205654896260, guid: 9195f3ccd5d89094cacbf4b53239d95f, type: 3}
+    - target: {fileID: -6804657211853263531, guid: bd25f952901ffe64c9efa3929c1d8e7f, type: 3}
+      propertyPath: eventCooldown
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: -6804657211853263531, guid: bd25f952901ffe64c9efa3929c1d8e7f, type: 3}
       propertyPath: defaultMessage
       value: Press E to answer the phone
