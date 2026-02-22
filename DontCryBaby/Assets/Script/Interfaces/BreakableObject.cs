@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 [DisallowMultipleComponent]
-public class BreakableObject : MonoBehaviour
+public class BreakableObject : MonoBehaviour, IBreakable
 {
     [Header("Health")]
     [SerializeField] private float maxHealth = 30f;
@@ -46,6 +46,9 @@ public class BreakableObject : MonoBehaviour
     private Coroutine shakeRoutine;
     private Coroutine flashRoutine;
     private Coroutine punchRoutine;
+    
+    public float CurrentLife => currentHealth;
+    public float MaxLife => maxHealth;
 
     private AudioSource audioSource;
     private Color originalColor;
