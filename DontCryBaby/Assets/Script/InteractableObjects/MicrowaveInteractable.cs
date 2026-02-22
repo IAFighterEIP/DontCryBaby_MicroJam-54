@@ -12,17 +12,27 @@ public class MicrowaveInteractable : ItemInteractable
 
     [Header("Messages")]
     [SerializeField] private string insertMsg = "Microwave started...";
-    [SerializeField] private string doneMsg = "Biberon is now harmful!";
+    [SerializeField] private string doneMsg = "Baby bottle is now harmful!";
     [SerializeField] private string busyMsg = "Microwave is busy.";
 
     private bool isCooking = false;
 
     public override string GetPrompt(PlayerHands hands)
     {
-        if (isCooking) return "Microwave (busy)";
         if (hands == null) return "";
-        if (!hands.HasItem) return "Insert cold biberon";
-        return hands.HeldItem == inputCold ? "Put cold biberon" : "Doesn't fit";
+
+        // 🚫 Hide completely if empty hands
+        if (!hands.HasItem)
+            return "";
+
+        if (isCooking)
+            return "Microwave (busy)";
+
+        // Only show prompt if holding the correct item
+        if (hands.HeldItem == inputCold)
+            return "Heat baby bottle";
+
+        return "";
     }
 
     public override void Interact(PlayerHands hands)
@@ -36,7 +46,7 @@ public class MicrowaveInteractable : ItemInteractable
 
         if (!hands.HasItem || hands.HeldItem != inputCold)
         {
-            Say("You need a cold biberon.");
+            Say("You need a cold Baby bottle.");
             return;
         }
 

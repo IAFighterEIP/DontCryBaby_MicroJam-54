@@ -13,8 +13,17 @@ public class BabyItemReceiver : ItemInteractable
     public override string GetPrompt(PlayerHands hands)
     {
         if (hands == null) return "";
-        if (!hands.HasItem) return "Give something";
-        return hands.HeldItem == harmBiberon ? "Give harmful biberon" : "Baby doesn't want that";
+
+        // 🚫 No prompt if empty hands
+        if (!hands.HasItem)
+            return "";
+
+        // 🚫 No prompt if wrong item
+        if (hands.HeldItem != harmBiberon)
+            return "";
+
+        // ✅ Only show if correct item
+        return "Give baby bottle";
     }
 
     public override void Interact(PlayerHands hands)
@@ -23,7 +32,7 @@ public class BabyItemReceiver : ItemInteractable
 
         if (!hands.HasItem || hands.HeldItem != harmBiberon)
         {
-            Say("Bring me the harmful biberon!");
+            Say("Bring me the harmful Baby bottle!");
             return;
         }
 
@@ -34,6 +43,6 @@ public class BabyItemReceiver : ItemInteractable
             baby.DecreaseAngerMultiplier(angerMultiplierDecrease);
             baby.CalmBaby(angerCalm);
 
-        Say("Baby got the feeding bottle...");
+        Say("Baby got the baby bottle...");
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerHands : MonoBehaviour
@@ -7,35 +8,39 @@ public class PlayerHands : MonoBehaviour
     public bool HasItem => heldItem != null;
     public ItemSO HeldItem => heldItem;
 
+    public event Action<ItemSO> OnHeldItemChanged;
+
+    private void SetHeld(ItemSO item)
+    {
+        heldItem = item;
+        OnHeldItemChanged?.Invoke(heldItem);
+    }
+
     public bool TryPick(ItemSO item)
     {
         if (item == null || HasItem) return false;
-        heldItem = item;
-        // TODO: update UI icon
+        SetHeld(item);
         return true;
     }
 
     public ItemSO Drop()
     {
         ItemSO item = heldItem;
-        heldItem = null;
-        // TODO: update UI icon
+        SetHeld(null);
         return item;
     }
 
     public bool TryConsume(ItemSO expected)
     {
         if (heldItem == null || heldItem != expected) return false;
-        heldItem = null;
-        // TODO: update UI icon
+        SetHeld(null);
         return true;
     }
 
     public bool TryReplace(ItemSO newItem)
     {
         if (newItem == null) return false;
-        heldItem = newItem;
-        // TODO: update UI icon
+        SetHeld(newItem);
         return true;
     }
 }

@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: WarmFeedingBottle
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   id: 11
-  displayName: Warm Feeding Bottle
-  icon: {fileID: 0}
+  displayName: Warm Baby Bottle
+  icon: {fileID: 8232517046638862389, guid: c53869c316194344d84852166164bcc4, type: 3}

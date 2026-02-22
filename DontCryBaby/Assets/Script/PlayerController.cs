@@ -8,7 +8,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private PlayerHands playerHands;
-    [SerializeField] private TextMeshProUGUI promptText;
+    [SerializeField] private PlayerHUD hud;
+    [SerializeField] private LayerMask interactMask = ~0;
 
     private Rigidbody2D rb;
     private Vector2 movement;
@@ -19,6 +20,13 @@ public class PlayerController : MonoBehaviour
 
         if (playerHands == null)
             playerHands = GetComponent<PlayerHands>();
+
+        // Subscribe to hands changes -> update HUD
+        if (playerHands != null && hud != null)
+        {
+            hud.SetHeldItem(playerHands.HeldItem);
+            playerHands.OnHeldItemChanged += hud.SetHeldItem;
+        }
     }
 
     void Update()
@@ -101,54 +109,52 @@ public class PlayerController : MonoBehaviour
     
     void UpdatePrompt()
     {
-        if (promptText == null)
-            return;
+        if (hud == null) return;
 
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, interactRange);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, interactRange, interactMask);
 
         ItemInteractable closestItem = null;
         InteractableObject closestTask = null;
+        float bestDist = Mathf.Infinity;
 
-        float minDistance = Mathf.Infinity;
-
-        foreach (Collider2D hit in hits)
+        foreach (var hit in hits)
         {
             if (hit.gameObject == gameObject)
                 continue;
 
-            float distance = Vector2.Distance(transform.position, hit.transform.position);
-            if (distance > minDistance)
-                continue;
+            Vector2 p = hit.ClosestPoint(transform.position);
+            float d = Vector2.Distance(transform.position, p);
+            if (d > bestDist) continue;
 
-            var itemObj = hit.GetComponent<ItemInteractable>();
+            var itemObj = hit.GetComponentInParent<ItemInteractable>();
             if (itemObj != null)
             {
                 closestItem = itemObj;
                 closestTask = null;
-                minDistance = distance;
+                bestDist = d;
                 continue;
             }
 
-            var taskObj = hit.GetComponent<InteractableObject>();
+            var taskObj = hit.GetComponentInParent<InteractableObject>();
             if (taskObj != null && taskObj.canInteract)
             {
                 closestTask = taskObj;
                 closestItem = null;
-                minDistance = distance;
+                bestDist = d;
             }
         }
 
         if (closestItem != null)
         {
-            promptText.text = $"<color=yellow>[E]</color> {closestItem.GetPrompt(playerHands)}";
+            hud.SetPrompt(closestItem.GetPrompt(playerHands));
         }
         else if (closestTask != null)
         {
-            promptText.text = "[E] Interact";
+            hud.SetPrompt("Interact");
         }
         else
         {
-            promptText.text = "";
+            hud.SetPrompt("");
         }
     }
 }
